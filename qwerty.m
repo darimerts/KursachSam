@@ -132,7 +132,7 @@ end
 
 i = 1:N;
 
-figure;
-plot(Time,R,xm,yy,'ko',xmi,yyy,'ko');
+%figure;
+%plot(Time,R,xm,yy,'ko',xmi,yyy,'ko');
 figure;
 plot(i,R,period,RRR,'ko');
