@@ -112,27 +112,18 @@ end
 k=1;n=1;
 for i=1:N1
     if k<=N2
-        if imin(i)>imax(k)
+        if imax(i)>imin(k)
             %cycleb(n) = fminbnd('R',imax(i),imin(k));
             period(n) = imin(i);
-            min = R(period(n));
-            RRR(n) = min;
-            for j=imin(k):imax(i)
-                if min>R(j)
-                    period(n)=j;
-                    min = R(j);
-                    RRR(n) = min;
-                end
-            end               
+            
             n=n+1;
             k=k+1;
         end
     end
 end
 
-i = 1:N;
+
 
 figure;
 plot(Time,R,xm,yy,'ko',xmi,yyy,'ko');
-figure;
-plot(i,R,period,RRR,'ko');
+
