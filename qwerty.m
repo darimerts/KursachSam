@@ -21,14 +21,36 @@ R = U/I;
 %Вывод графика
 %figure;
 %plot(Time,R);
-
-
-Fy=fft(R);
-F1=50/60; F2=90/60;
+FF=fft(R);
+F1=0.3; F2=30;
 Tov=N/Fd;
 dF=1/Tov;
 F(i)=i*dF;
 j=1:1:N/2;
+for i=1:1:(N+1)/2
+    if F(i)<F1 
+        FF(i)=0;
+        FF(N-i)=0;
+    end;
+    if F(i)>F2 
+        FF(i)=0;
+        FF(N-i)=0;
+    end;
+    if F(i)>(F2-dF)
+        if F(i)<(F2+dF)
+            imax=i;
+        end;
+    end;
+end;
+R=real(ifft(FF));
+
+%figure;
+%plot(Time,R);
+
+
+
+Fy=fft(R);
+F1=50/60; F2=90/60;
 %figure;
 %plot(F(j),abs(Fy(j)));
 
