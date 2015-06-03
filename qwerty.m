@@ -16,18 +16,52 @@ U = A/(10^3);
 I = 1/(10^3);
 R = U/I;
 
+temp=0; aa=0; bb=-2/35*100000;
+for i=1:1:N
+    temp=temp+R(i);
+    ssss(i)=temp;
+    sss(i)=ssss(i)-(aa+bb*Time(i));
+end
 
 
 %Вывод графика
-%figure;
-%plot(Time,R);
+figure;
+plot(Time,sss);
 
-
-Fy=fft(R);
-F1=50/60; F2=90/60;
+FF=fft(sss);
+kk=1:1:N;
 Tov=N/Fd;
 dF=1/Tov;
-F(i)=i*dF;
+F(kk)=kk*dF;
+
+%figure;
+%plot(F(kk),abs(FF(kk)));
+
+FF1=50/60; FF2=70/60;
+for k=1:1:(N+1)/2
+    if F(k)<FF1 
+        FF(k)=0;
+        FF(N-k+1)=0;
+    end;
+    if F(k)>FF2 
+        FF(k)=0;
+        FF(N-k+1)=0;
+    end;
+end;
+
+
+
+
+%figure;
+%plot(F(kk),abs(FF(kk)));
+
+yy=real(ifft(FF));
+figure;
+plot(kk,yy);
+
+Fy=fft(R);
+F1=40/60; F2=90/60;
+
 j=1:1:N/2;
 %figure;
 %plot(F(j),abs(Fy(j)));
@@ -48,7 +82,7 @@ for i=1:1:(N+1)/2
     end;
 end;
 
-j=1:1:imax;
+%j=1:1:imax;
 y=real(ifft(Fy));
 
 %figure;
@@ -136,3 +170,4 @@ i = 1:N;
 %plot(Time,R,xm,yy,'ko',xmi,yyy,'ko');
 figure;
 plot(i,R,period,RRR,'ko');
+
