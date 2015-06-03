@@ -7,7 +7,7 @@ formatSpec = '%d';
 A = fscanf(fileID,formatSpec);
 fclose(fileID);
 
-%Задание времени и амплитуды диф.регоэнцефалограммы
+%Задание времени и амплитуды
 N = length(A);
 i = 1:N;
 Fd = 200;
@@ -15,150 +15,164 @@ Time = i/Fd;
 U = A/(10^3);
 I = 1/(10^3);
 R = U/I;
-d=length(R);
-%Вычисление реограммы
-sym(1)=0;
-for i=(2:1:N)
-  sym(i)=R(i-1)+sym(i-1); 
-end;
-Rint=sym;
-
-%Вывод графика полученной РЭГ
-figure;
-plot(Time,Rint);
-
-FF1=fft(Rint);
-%F1=50; F2=30;
-Flow=0;
-Tov=N/Fd;
-dF=1/Tov;
-F(i)=i*dF;
-j=1:1:N/2;
-%figure;
-%plot(abs(FF1(j)),F(i));
-
-
-
-%Расчет и построение спектра РЭГ
-N1=length(Rint);
-Tov=N1/Fd;
-F1=50;
-dF=1/Tov;
-F(i)=i*dF;
-j=1:1:N1;
-SpectrRint=fft(Rint);
+Rdif=-R;
 
 figure;
-plot(abs(SpectrRint(j)));
-figure;
-plot(Time,real(ifft(SpectrRint)));
+plot(Time,Rdif);
+legend('Дифференциальная РЭГ');
+xlabel('Время'); 
+ylabel('Сопротивление');
 
-for i=1:1:(N1+1)/2
-    if i<50
-        SpectrRint(i)=0;
-        SpectrRint(N1-i+1)=0;
-    end;
-       % if i>10000 
-        %SpectrRint(i)=0;
-        %SpectrRint(N1-i+1)=0;
-    %end;
-    end;
-    
-Rintn=real(ifft(SpectrRint));
-
-figure;
-plot(Time,Rintn);
-
-<<<<<<< HEAD
 temp=0; aa=0; bb=-2/35*100000;
 for i=1:1:N
-    temp=temp+R(i);
-    ssss(i)=temp;
-    sss(i)=ssss(i)-(aa+bb*Time(i));
-end
+    temp=temp+Rdif(i);
+    Reo(i)=temp;
+ end
 
-
-%Вывод графика
 figure;
-plot(Time,sss);
+plot(Time,Reo);
+legend('РЭГ');
+xlabel('Время'); 
+ylabel('Сопротивление');
 
-FF=fft(sss);
+%Убираем линейный тренд
+
+detrend_Reo=detrend(Reo,8);
+trend=Reo-detrend_Reo;
+
+%Убираем полиномиальный тренд(узнать на сколько меняется сигнал, спектр 
+%изменяется, правильно ли это?
+x = Time;
+y = Reo; 
+
+[p,s,mu] = polyfit(x,y,40);
+trend1=polyval(p,Time,[],mu);
+detrend_Reo1=Reo-trend1;
+
+%Линейная Регрессионная кривая
+%Time_middle=sym(Time(i))/N;
+%Reo_middle=sym(Reo(i))/N;
+%b=(sum(Time(i)*Reo(i))+N*Time_middle*Reo_middle)/(sum(Time(i)*Time(i))+N*Time_middle*Time_middle);
+%a=Reo_middle/(b*Time_middle);
+%Regres(i)=b*Time(i)+a;
+%disp(b);
+%disp(a);
+
+%Линейная регрессионная кривая(аналог 1)
+
+%Regres1=5503*Time+3.201*10^4;
+
+%Вывод РЭГ с трендом/без тренд/самого тренда/регрессионной кривой и т.д.
+
+figure;
+plot(Time,Reo);
+
+hold on;
+plot(Time,trend,':r');
+
+hold on;
+plot(Time,detrend_Reo,'m');
+
+hold on;
+plot(Time,trend1,':c');
+
+hold on;
+plot(Time,detrend_Reo1,'y');
+
+%hold on;
+%plot(Time,trend1,':r');
+
+%hold on;
+%plot(Time,detrend_Reo1,'m');
+
+
+%hold on;
+%plot(Time,Regres,'c');
+
+%hold on;
+%plot(Time,Regres1,'y');
+
+legend('РЭГ с трендом','Тренд','РЭГ без линейного тренда','Тренд1','РЭГ без полиномиального тренда');
+xlabel('Время'); 
+ylabel('Сопротивление');
+
+%Спектр РЭГ без тренда(лин.регрессия)
+FF=fft(detrend_Reo);
 kk=1:1:N;
 Tov=N/Fd;
 dF=1/Tov;
 F(kk)=kk*dF;
 
-%figure;
-%plot(F(kk),abs(FF(kk)));
+%Построение спектра
+figure;
+plot(F(kk),abs(FF(kk)));
 
-FF1=50/60; FF2=70/60;
+%Спектр РЭГ с трендом
+FF10=fft(Reo);
+kk=1:1:N;
+Tov=N/Fd;
+dF=1/Tov;
+F(kk)=kk*dF;
+
+%Построение спектра
+figure;
+plot(F(kk),abs(FF10(kk)));
+
+%Спектр РЭГ без тренда(полиномиальная регрессия)
+FF11=fft(detrend_Reo1);
+kk=1:1:N;
+Tov=N/Fd;
+dF=1/Tov;
+F(kk)=kk*dF;
+
+%Построение спектра
+figure;
+plot(F(kk),abs(FF11(kk)));
+
+
+
+
+FF1=18/60; FF2=30;
 for k=1:1:(N+1)/2
     if F(k)<FF1 
-        FF(k)=0;
-        FF(N-k+1)=0;
-    end;
-    if F(k)>FF2 
-        FF(k)=0;
-        FF(N-k+1)=0;
+        FF10(k)=0;
+        FF10(N-k+1)=0;
+        end;
+        if F(k)>FF2 
+        FF11(k)=0;
+        FF11(N-k+1)=0;
     end;
 end;
-=======
+
+yy=real(ifft(FF10));
 figure;
-plot(abs(fft(Rintn)));
+plot(kk,yy);
 
-fname =['C:\Users\Дарина\Documents\GitHub\KursachSam\111.mat']; 
-load(fname);
-legh_fi=length(G)-1;
-x=zeros([1,length(Rint)]);
-y=zeros([1,length(Rint)]);
-x=Rint;
-%figure;
-%plot(Time,x);
-for k=1:legh_fi
-for i=3:length(y)
-y(i)=((SOS(k,4)*x(i)+SOS(k,5)*x(i-1)+SOS(k,6)*x(i-2))*(G(k))-(SOS(k,2)*y(i-1)+SOS(k,3)*y(i-2)))/SOS(k,1);
-end;
-for i=3:length(y)
-x(i)=y(i);
-end;
-end;
-Rintf=y;
-%Rint=real(ifft(x));
-
-
-FF10=fft(Rint,100);
-b=length(FF);
-%figure;
-%plot(F,abs(FF10));
-for i=1:1:(N+1)/2
-    if F(i)<F1 
-        FF(i)=0;
-        FF(N-i)=0;
+FF1=18/60; FF2=30;
+for k=1:1:(N+1)/2
+    if F(k)<FF1 
+        FF11(k)=0;
+        FF11(N-k+1)=0;
+        end;
+        if F(k)>FF2 
+        FF11(k)=0;
+        FF11(N-k+1)=0;
     end;
-    end;
-Rintn=real(ifft(FF));
->>>>>>> origin/master
+end;
 
+yy=real(ifft(FF11));
 figure;
-plot(Time,Rintn);
+plot(kk,yy);
 
-
-
-%figure;
-%plot(F(kk),abs(FF(kk)));
 
 yy=real(ifft(FF));
 figure;
 plot(kk,yy);
 
 Fy=fft(R);
-<<<<<<< HEAD
 F1=40/60; F2=90/60;
 
 j=1:1:N/2;
-=======
-F1=50/60; F2=90/60;
->>>>>>> origin/master
 %figure;
 %plot(F(j),abs(Fy(j)));
 
@@ -264,11 +278,5 @@ i = 1:N;
 
 %figure;
 %plot(Time,R,xm,yy,'ko',xmi,yyy,'ko');
-<<<<<<< HEAD
 figure;
 plot(i,R,period,RRR,'ko');
-
-=======
-%figure;
-%plot(i,R,period,RRR,'ko');
->>>>>>> origin/master
